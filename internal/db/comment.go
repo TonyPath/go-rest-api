@@ -37,7 +37,7 @@ func (d *Database) QueryComment(ctx context.Context, id string) (comment.Comment
 	WHERE
 		id = $1`
 
-	row := d.Client.QueryRowContext(ctx, q, id)
+	row := d.DBConn.QueryRowContext(ctx, q, id)
 
 	var cmtDB CommentDB
 	err := row.Scan(&cmtDB.ID, &cmtDB.Slug, &cmtDB.Body, &cmtDB.Author)
@@ -65,7 +65,7 @@ func (d *Database) InsertComment(ctx context.Context, cmt comment.Comment) (comm
 	(:id, :slug, :body, :author)
 	`
 
-	_, err := d.Client.NamedExecContext(ctx, q, newCommentDB)
+	_, err := d.DBConn.NamedExecContext(ctx, q, newCommentDB)
 	if err != nil {
 		return comment.Comment{}, fmt.Errorf("failed to insert comment: %w", err)
 	}
@@ -76,7 +76,7 @@ func (d *Database) InsertComment(ctx context.Context, cmt comment.Comment) (comm
 func (d *Database) DeleteComment(ctx context.Context, id string) error {
 	const q = `DELETE FROM comments WHERE id = $1`
 
-	_, err := d.Client.ExecContext(ctx, q, id)
+	_, err := d.DBConn.ExecContext(ctx, q, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete comment: %w", err)
 	}
@@ -101,7 +101,7 @@ func (d *Database) UpdateComment(ctx context.Context, id string, cmt comment.Com
 		id = :id
 	`
 
-	_, err := d.Client.NamedExecContext(ctx, q, updateCommentDB)
+	_, err := d.DBConn.NamedExecContext(ctx, q, updateCommentDB)
 	if err != nil {
 		return comment.Comment{}, fmt.Errorf("failed to insert comment: %w", err)
 	}

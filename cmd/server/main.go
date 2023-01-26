@@ -5,6 +5,7 @@ import (
 
 	"github.com/TonyPath/go-rest-api/internal/comment"
 	"github.com/TonyPath/go-rest-api/internal/db"
+	transportHTTP "github.com/TonyPath/go-rest-api/internal/transport/http"
 )
 
 func main() {
@@ -30,7 +31,11 @@ func run() error {
 	}
 
 	cmtService := comment.NewService(db)
-	_ = cmtService
+
+	httpHandler := transportHTTP.NewHandler(cmtService)
+	if err := httpHandler.Serve(); err != nil {
+		return nil
+	}
 
 	return nil
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type Database struct {
-	Client *sqlx.DB
+	DBConn *sqlx.DB
 }
 
 func NewDatabase() (*Database, error) {
@@ -29,6 +29,6 @@ func NewDatabase() (*Database, error) {
 	}
 
 	return &Database{
-		Client: dbConn,
+		DBConn: dbConn,
 	}, nil
 }
