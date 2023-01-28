@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/TonyPath/go-rest-api/internal/comment"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
@@ -21,13 +22,34 @@ type Response struct {
 	Message string
 }
 
+type newCommentRequest struct {
+	Slug   string `json:"slug" validate:"required"`
+	Author string `json:"author" validate:"required"`
+	Body   string `json:"body" validate:"required"`
+}
+
+func (newCmtReq newCommentRequest) toComment() comment.Comment {
+	return comment.Comment{
+		Slug:   newCmtReq.Slug,
+		Author: newCmtReq.Author,
+		Body:   newCmtReq.Body,
+	}
+}
+
 func (h *Handler) PostComment(w http.ResponseWriter, r *http.Request) {
-	var cmt comment.Comment
-	if err := json.NewDecoder(r.Body).Decode(&cmt); err != nil {
+	var newCommentReq newCommentRequest
+	if err := json.NewDecoder(r.Body).Decode(&newCommentReq); err != nil {
 		return
 	}
 
-	cmt, err := h.CommentSevice.CreateComment(r.Context(), cmt)
+	validate := validator.New()
+	err := validate.Struct(newCommentReq)
+	if err != nil {
+		http.Error(w, "not a valid comment", http.StatusBadRequest)
+		return
+	}
+
+	cmt, err := h.CommentSevice.CreateComment(r.Context(), newCommentReq.toComment())
 	if err != nil {
 		log.Println(err)
 		return
