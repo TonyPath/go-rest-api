@@ -18,7 +18,7 @@ func TestPostComment(t *testing.T) {
 
 		resp, err := client.R().
 			SetHeader("Authorization", "bearer "+createToken()).
-			SetBody(`{"slug":"/", "auth":"tony", "body":"go rest api"}`).
+			SetBody(`{"slug":"/", "author":"tony", "body":"go rest api"}`).
 			Post("http://localhost:8080/api/v1/comments")
 
 		require.NoError(t, err)

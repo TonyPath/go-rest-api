@@ -21,7 +21,7 @@ func JWTAuth(next apiHandlerFunc) apiHandlerFunc {
 		}
 
 		authHeaderParts := strings.Split(authHeader[0], " ")
-		if len(authHeaderParts) != 2 || strings.ToLower(authHeader[0]) != "bearer" {
+		if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != "bearer" {
 			http.Error(w, "not authorized", http.StatusUnauthorized)
 			return
 		}
